@@ -1,0 +1,23 @@
+{
+  "name": "xml-signature-parser",
+  "version": "1.0.0",
+  "description": "Parse xml file Signature",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "parse": "n"
+  },
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "parse": "./src/index.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.2.1",
+    "fast-xml-parser": "^3.19.0",
+    "fs-extra": "^10.0.0",
+    "he": "^1.2.0",
+    "yargs": "13.2"
+  }
+}

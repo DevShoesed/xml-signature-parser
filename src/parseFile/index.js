@@ -1,6 +1,10 @@
-import fse from 'fs-extra'
-import parser from 'fast-xml-parser'
-import he from 'he'
+// import fse from 'fs-extra'
+// import parser from 'fast-xml-parser'
+// import he from 'he'
+
+const fse = require('fs-extra')
+const parser = require('fast-xml-parser')
+const he = require('he')
 
 const xmlOptions = {
   attributeNamePrefix: '@_',
@@ -22,11 +26,12 @@ const xmlOptions = {
   stopNodes: ['pa'],
 }
 
-function getSegnaturaObj(pathXmlFIle) {
+const getSegnaturaObj = function (pathXmlFIle) {
   const xmlData = fse.readFileSync(pathXmlFIle)
   const jsonObj = parser.parse(xmlData.toString(), xmlOptions)
 
   return jsonObj
 }
 
-export default { getSegnaturaObj }
+module.exports = { getSegnaturaObj }
+// export default { getSegnaturaObj }

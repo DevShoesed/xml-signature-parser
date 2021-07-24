@@ -1,9 +1,12 @@
-import yargs from 'yargs'
-import fse from 'fs-extra'
+// import yargs from 'yargs'
+// import fse from 'fs-extra'
+// import parseFile from './parseFile/index.js'
+// import Excel from 'exceljs'
 
-import parseFile from './parseFile/index.js'
-
-import Excel from 'exceljs'
+const yargs = require('yargs')
+const fse = require('fs-extra')
+const parseFile = require('./parseFile/index.js')
+const Excel = require('exceljs')
 
 const options = yargs.usage('Usage: -d <directory>').option('d', {
   alias: 'directory',
@@ -20,11 +23,15 @@ try {
     { header: 'Id', key: 'id', width: 10 },
     { header: 'Numero', key: 'numero', width: 32 },
     { header: 'Anno', key: 'anno', width: 32 },
+    { header: 'Tipo', key: 'tipo', width: 5 },
+    { header: 'Documento', key: 'documento', width: 150 },
   ]
 
   const subdirs = fse.readdirSync(options.directory)
 
-  subdirs.forEach(async (file) => {
+  const fileName = `${options.directory.split('/').pop()}.xlsx`
+
+  subdirs.forEach((file) => {
     const segnaturaObj = parseFile.getSegnaturaObj(
       `${options.directory}/${file}/Segnatura.xml`
     )
@@ -36,28 +43,32 @@ try {
       anno: new Date(
         segnaturaObj.Segnatura.Intestazione.Identificatore.DataRegistrazione
       ).getFullYear(),
+      tipo: 'doc',
+      documento: segnaturaObj.Segnatura.Descrizione.Documento.attr['@_nome'],
     }
+
+    worksheet.addRow(row)
 
     if (segnaturaObj.Segnatura.Descrizione.Allegati) {
-      //console.log(segnaturaObj.Segnatura.Descrizione.Allegati)
-      Object(segnaturaObj.Segnatura.Descrizione.Allegati).forEach((all) => {
-        console.log(all)
-      })
-      // var i = 1
-      // segnaturaObj.Segnatura.Descrizione.Allegati.forEach(async (all) => {
-      //   //row[`allegato${i}`] = all.
-      //   console.log(all)
-      //   i++
-      // })
-    }
+      const doc = segnaturaObj.Segnatura.Descrizione.Allegati.Documento
+      const documento = Array.isArray(doc) ? doc : [doc]
 
-    await worksheet.addRow(row)
+      documento.forEach((allegato) => {
+        worksheet.addRow({
+          id: row.id,
+          numero: row.numero,
+          anno: row.anno,
+          tipo: 'all',
+          documento: allegato.attr['@_nome'],
+        })
+      })
+    }
   })
 
-  await workbook.xlsx
-    .writeFile('export.xlsx')
+  workbook.xlsx
+    .writeFile(fileName)
     .then(() => {
-      console.log('saved')
+      console.log(`${fileName} saved`)
     })
     .catch((err) => {
       console.log('err', err)

@@ -36,32 +36,43 @@ try {
       `${options.directory}/${file}/Segnatura.xml`
     )
 
-    const row = {
-      id: file,
-      numero:
-        segnaturaObj.Segnatura.Intestazione.Identificatore.NumeroRegistrazione,
-      anno: new Date(
-        segnaturaObj.Segnatura.Intestazione.Identificatore.DataRegistrazione
-      ).getFullYear(),
-      tipo: 'doc',
-      documento: segnaturaObj.Segnatura.Descrizione.Documento.attr['@_nome'],
-    }
+    if (
+      segnaturaObj &&
+      segnaturaObj.Segnatura &&
+      segnaturaObj.Segnatura.Intestazione &&
+      segnaturaObj.Segnatura.Intestazione.Identificatore &&
+      segnaturaObj.Segnatura.Intestazione.Identificatore.NumeroRegistrazione &&
+      segnaturaObj.Segnatura.Intestazione.Identificatore.DataRegistrazione &&
+      segnaturaObj.Segnatura.Descrizione.Documento
+    ) {
+      const row = {
+        id: file,
+        numero:
+          segnaturaObj.Segnatura.Intestazione.Identificatore
+            .NumeroRegistrazione,
+        anno: new Date(
+          segnaturaObj.Segnatura.Intestazione.Identificatore.DataRegistrazione
+        ).getFullYear(),
+        tipo: 'doc',
+        documento: segnaturaObj.Segnatura.Descrizione.Documento.attr['@_nome'],
+      }
 
-    worksheet.addRow(row)
+      worksheet.addRow(row)
 
-    if (segnaturaObj.Segnatura.Descrizione.Allegati) {
-      const doc = segnaturaObj.Segnatura.Descrizione.Allegati.Documento
-      const documento = Array.isArray(doc) ? doc : [doc]
+      if (segnaturaObj.Segnatura.Descrizione.Allegati) {
+        const doc = segnaturaObj.Segnatura.Descrizione.Allegati.Documento
+        const documento = Array.isArray(doc) ? doc : [doc]
 
-      documento.forEach((allegato) => {
-        worksheet.addRow({
-          id: row.id,
-          numero: row.numero,
-          anno: row.anno,
-          tipo: 'all',
-          documento: allegato.attr['@_nome'],
+        documento.forEach((allegato) => {
+          worksheet.addRow({
+            id: row.id,
+            numero: row.numero,
+            anno: row.anno,
+            tipo: 'all',
+            documento: allegato.attr['@_nome'],
+          })
         })
-      })
+      }
     }
   })
 
